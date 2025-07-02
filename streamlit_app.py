@@ -27,8 +27,7 @@ if uploaded_file:
         fig = px.line(edited_df, x=x_col, y=y_col, markers=True)
         st.plotly_chart(fig, use_container_width=True)
 
-    with st.expander("Download Your Edited Data"):
-        from io import BytesIO
+    from io import BytesIO
 
 with st.expander("Download Your Edited Data"):
     output = BytesIO()
@@ -41,7 +40,3 @@ with st.expander("Download Your Edited Data"):
         file_name="edited_data.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
-        st.download_button("Download as Excel", excel_bytes, file_name="edited_data.xlsx")
-else:
-    st.info("Please upload an Excel (.xlsx) file to use the dashboard.")
