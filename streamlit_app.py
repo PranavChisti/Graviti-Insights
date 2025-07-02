@@ -5,8 +5,15 @@ from io import BytesIO
 
 st.set_page_config(page_title="Graviti BI Dashboard", layout="wide")
 
-# ✅ Show logo image at the top
-st.image("LOGO-DASHBOARD.png", width=150)
+st.markdown(
+    """
+    <div style='display: flex; justify-content: space-between; align-items: center;'>
+        <h1 style='margin-bottom: 0;'>Graviti Business Intelligence Dashboard</h1>
+        <img src='LOGO-DASHBOARD.png' width='120' style='margin-bottom: 10px;'/>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 st.title("Graviti Business Intelligence Dashboard")
 uploaded_file = st.file_uploader("Upload your Excel file", type=["xlsx"])
