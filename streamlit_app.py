@@ -3,9 +3,9 @@ import pandas as pd
 import plotly.express as px
 from io import BytesIO
 
-st.set_page_config(page_title="Excel Insights Dashboard", layout="wide")
+st.set_page_config(page_title="Graviti BI Dashboard", layout="wide")
 
-st.title("Excel-Based Company Insights Dashboard")
+st.title("Graviti Business Intelligence Dashboard")
 uploaded_file = st.file_uploader("Upload your Excel file", type=["xlsx"])
 
 if uploaded_file is not None:
