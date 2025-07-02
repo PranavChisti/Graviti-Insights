@@ -3,40 +3,42 @@ import pandas as pd
 import plotly.express as px
 from io import BytesIO
 
-st.set_page_config(layout="wide")
-st.title("Excel-Based Company Insights Dashboard")
+st.set_page_config(page_title="Excel Insights Dashboard", layout="wide")
 
+st.title("Excel-Based Company Insights Dashboard")
 uploaded_file = st.file_uploader("Upload your Excel file", type=["xlsx"])
-if uploaded_file:
+
+if uploaded_file is not None:
     xls = pd.ExcelFile(uploaded_file)
     sheet_names = xls.sheet_names
+
     selected_sheet = st.selectbox("Select a sheet", sheet_names)
-    df = pd.read_excel(xls, sheet_name=selected_sheet)
+    df = xls.parse(selected_sheet)
+    st.subheader("Preview of Data")
+    edited_df = st.data_editor(df, use_container_width=True, num_rows="dynamic")
 
-    st.subheader("Data Preview & Edit")
-    edited_df = st.data_editor(df, num_rows="dynamic")
+    st.markdown("---")
+    numeric_cols = edited_df.select_dtypes(include='number').columns.tolist()
 
-    st.subheader("Summary Statistics")
-    st.write(edited_df.describe())
-
-    st.subheader("Visualize Numeric Data")
-    numeric_cols = edited_df.select_dtypes(include=['float64', 'int64']).columns
-    if len(numeric_cols) >= 2:
-        x_col = st.selectbox("X-axis", numeric_cols)
-        y_col = st.selectbox("Y-axis", numeric_cols, index=1)
-        fig = px.line(edited_df, x=x_col, y=y_col, markers=True)
+    if numeric_cols:
+        st.subheader("Visualize Numeric Data")
+        y_axis = st.selectbox("Choose column to visualize", numeric_cols)
+        fig = px.line(edited_df, y=y_axis, title=f"{y_axis} Over Index")
         st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("No numeric columns available for visualization.")
 
-    from io import BytesIO
-
-with st.expander("Download Your Edited Data"):
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        edited_df.to_excel(writer, index=False)
-    output.seek(0)
-    st.download_button(
-        label="Download as Excel",
-        data=output,
-        file_name="edited_data.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+    with st.expander("Download Your Edited Data"):
+        output = BytesIO()
+        try:
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                edited_df.to_excel(writer, index=False)
+            output.seek(0)
+            st.download_button(
+                label="Download as Excel",
+                data=output,
+                file_name="edited_data.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+        except Exception as e:
+            st.error(f"Failed to generate Excel file: {e}")
